@@ -129,8 +129,7 @@ When done close the Finder window but do not eject the image yet.
 Open the Terminal applications and copy the hidden, system `.DS_Store` file
 
 ```bash
-cd "/Volumes/CIAO ${VER}.0"
-cp .DS_Store ~/ciao-hack-DS_Store
+(cd "/Volumes/CIAO ${VER}.0" ; cp .DS_Store ~/ciao-hack-DS_Store)
 ```
 
 This file contains all the information about the icon location, size,
