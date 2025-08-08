@@ -1,4 +1,4 @@
-setenv CONDA_PREFIX /Applications/ciao-4.17
+setenv CONDA_PREFIX /Applications/ciao-@VER@
 
 set path = (${CONDA_PREFIX}/bin $path)
 

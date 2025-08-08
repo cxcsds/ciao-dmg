@@ -1,4 +1,5 @@
-CONDA_PREFIX=/Applications/ciao-4.17
+
+CONDA_PREFIX=/Applications/ciao-@VER@
 export CONDA_PREFIX
 
 PATH="${CONDA_PREFIX}/bin:${PATH}"

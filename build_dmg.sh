@@ -2,7 +2,7 @@
 
 
 TMPDIR=foo
-PATCH_DIR=$HOME/CIAO_DMG
+PATCH_DIR=/Users/kjg/Temp/DMG/ciao-dmg/CIAO_DMG
 VER=4.17
 OS=`uname -m`
 
@@ -19,7 +19,7 @@ conda create -p /Applications/ciao-${VER} \
 
 # Move it to temp dir and patch in files
 
-mkdir ${TMPDIR}
+mkdir -p ${TMPDIR}
 mv /Applications/ciao-${VER} ${TMPDIR}/
 
 mkdir ${TMPDIR}/.background
@@ -31,9 +31,9 @@ ln -s /Applications ${TMPDIR}/
 
 # --------------------
 # Add in setup scripts
-# TODO: scripts are hard-coded for 4.17
 
-cp ${PATCH_DIR}/ciao.*sh ${TMPDIR}/ciao-${VER}/bin/
+sed "s/@VER@/${VER}/" ${PATCH_DIR}/ciao.sh > ${TMPDIR}/ciao-${VER}/bin/ciao.sh
+sed "s/@VER@/${VER}/" ${PATCH_DIR}/ciao.csh > ${TMPDIR}/ciao-${VER}/bin/ciao.csh
 
 # -------------------
 
