@@ -3,7 +3,7 @@
 
 TMPDIR=foo
 PATCH_DIR=/Users/kjg/Temp/DMG/ciao-dmg/CIAO_DMG
-VER=4.17
+VER=4.18.0.b1
 OS=`uname -m`
 
 BACKGROUND=${PATCH_DIR}/install_w_readme.png
@@ -14,8 +14,8 @@ README=${PATCH_DIR}/ciao-hack-README.txt
 
 conda create -p /Applications/ciao-${VER} \
   --copy --yes \
-  -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
-  ciao pyciao ciao-contrib sherpa ds9 marx caldb 
+  -c https://cxc.cfa.harvard.edu/conda/test -c conda-forge \
+  ciao=4.18.0 ciao-contrib sherpa=4.17.1 ds9 marx caldb_main
 
 # Move it to temp dir and patch in files
 
