@@ -18,10 +18,11 @@ flag**
 conda create -p /Applications/ciao-${VER} \
   --copy --yes \
   -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
-  ciao pyciao ciao-contrib sherpa ds9 marx caldb 
+  ciao pyciao ciao-contrib sherpa ds9 marx caldb_main
 ```
 
 Note: you could add `ciao-src pyciao-src sherpa-src` if we wanted that.
+We decided to drop acis and hrc blank sky background files.
 
 ---
 
@@ -40,6 +41,7 @@ We also made a copy of the instructions and put them into a README.txt
 ```bash
 mkdir ${TMPDIR}
 mv /Applications/ciao-${VER} ${TMPDIR}/
+find ${TMPDIR}/ciao-${VER}  -type f \! -perm +u+w -exec chmod u+w {} \;
 
 mkdir ${TMPDIR}/.background
 cp ${BACKGROUND} ${TMPDIR}/.background
@@ -48,6 +50,9 @@ cp ${README} ${TMPDIR}/README.txt
 
 ln -s /Applications ${TMPDIR}/
 ```
+
+The `find` command was added to chmod the read-only files as they
+cause warnings when running `xattr` (below). 
 
 ---
 
@@ -79,9 +84,9 @@ manipulate them (create, attach, detach, convert).
 First we need to create a read+write version of the .dmg
 
 ```bash
-/bin/rm -f tmp_ciao-${VER}.0.dmg 
-hdiutil create -size 19.1Gb -format UDRW -fs HFS+J \
-   -volname "CIAO ${VER}.0"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.0.dmg 
+/bin/rm -f tmp_ciao-${VER}.dmg 
+hdiutil create -size 19.1Gb -format UDRW  \
+   -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
 ```
 
 The `-size 19.1Gb` is sufficient for CIAO 4.17 but will need to be reviewed/revised
@@ -96,7 +101,7 @@ background image changes).
 First we need to attach (ie open) the disk image we just created.
 
 ```
-hdiutil attach -readwrite tmp_ciao-${VER}.0.dmg
+hdiutil attach -readwrite tmp_ciao-${VER}.dmg
 ```
 
 It will show up as a drive on the desktop.
@@ -129,7 +134,7 @@ When done close the Finder window but do not eject the image yet.
 Open the Terminal applications and copy the hidden, system `.DS_Store` file
 
 ```bash
-(cd "/Volumes/CIAO ${VER}.0" ; cp .DS_Store ~/ciao-hack-DS_Store)
+(cd "/Volumes/CIAO ${VER}" ; cp .DS_Store ~/ciao-hack-DS_Store)
 ```
 
 This file contains all the information about the icon location, size,
@@ -147,7 +152,7 @@ created read+write_.  Note: Trying to copy the .DS_Store before the disk image
 is created doesn't work (or didn't work for me) so this requires this extra step.
 
 ```bash
-(cd "/Volumes/CIAO ${VER}.0"; cp -fv ${DS_STORE} .DS_Store)
+(cd "/Volumes/CIAO ${VER}"; cp -fv ${DS_STORE} .DS_Store)
 ```
 
 ---
@@ -157,17 +162,17 @@ is created doesn't work (or didn't work for me) so this requires this extra step
 First we detach the temp image now that the .DS_Store file has been created/copied.
 
 ```bash
-hdiutil detach "/Volumes/CIAO ${VER}.0"
+hdiutil detach "/Volumes/CIAO ${VER}"
 ```
 
 and finally we can create the compressed, read-only disk image
 
 
 ```bash
-rm ciao-${VER}.0-${OS}.dmg
-hdiutil convert tmp_ciao-${VER}.0.dmg -format UDZO -o ciao-${VER}.0-${OS}.dmg
+rm ciao-${VER}-${OS}.dmg
+hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${VER}-${OS}.dmg
 
-rm tmp_ciao-${VER}.0.dmg
+rm tmp_ciao-${VER}.dmg
 ```
 
 You may also want to go ahead and remove the `${TMPDIR}`

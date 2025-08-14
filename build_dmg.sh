@@ -21,6 +21,7 @@ conda create -p /Applications/ciao-${VER} \
 
 mkdir -p ${TMPDIR}
 mv /Applications/ciao-${VER} ${TMPDIR}/
+find ${TMPDIR}/ciao-${VER}  -type f \! -perm +u+w -exec chmod u+w {} \;
 
 mkdir ${TMPDIR}/.background
 cp ${BACKGROUND} ${TMPDIR}/.background
@@ -39,17 +40,17 @@ sed "s/@VER@/${VER}/" ${PATCH_DIR}/ciao.csh > ${TMPDIR}/ciao-${VER}/bin/ciao.csh
 
 # Create initial disk image, RW so we can add .DS_Store
 # TODO -- estimate size on fly, need to add extra for .DS_Store
-/bin/rm -f tmp_ciao-${VER}.0.dmg 
-hdiutil create -size 19.1Gb -format UDRW -fs HFS+J \
-   -volname "CIAO ${VER}.0"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.0.dmg 
+/bin/rm -f tmp_ciao-${VER}.dmg 
+hdiutil create -size 19.1Gb -format UDRW \
+   -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
    
 # Add .DS_Store
-hdiutil attach -readwrite tmp_ciao-${VER}.0.dmg
-(cd "/Volumes/CIAO ${VER}.0"; cp -fv ${DS_STORE} .DS_Store)
-hdiutil detach "/Volumes/CIAO ${VER}.0"
+hdiutil attach -readwrite tmp_ciao-${VER}.dmg
+(cd "/Volumes/CIAO ${VER}"; cp -fv ${DS_STORE} .DS_Store)
+hdiutil detach "/Volumes/CIAO ${VER}"
 
 # Create final compressed, read-only image
-rm ciao-${VER}.0-${OS}.dmg
-hdiutil convert tmp_ciao-${VER}.0.dmg -format UDZO -o ciao-${VER}.0-${OS}.dmg
+rm ciao-${VER}-${OS}.dmg
+hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${VER}-${OS}.dmg
 
-rm tmp_ciao-${VER}.0.dmg
+rm tmp_ciao-${VER}.dmg
