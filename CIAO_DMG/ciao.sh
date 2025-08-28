@@ -1,4 +1,3 @@
-
 CONDA_PREFIX=/Applications/ciao-@VER@
 export CONDA_PREFIX
 
