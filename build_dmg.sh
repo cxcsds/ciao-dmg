@@ -54,3 +54,4 @@ rm ciao-${VER}-${OS}.dmg
 hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${VER}-${OS}.dmg
 
 rm tmp_ciao-${VER}.dmg
+/bin/rm -rf ${}TMPDIR}
