@@ -1,4 +1,4 @@
-CIAO 4.18.0 macOS DMG archive
+CIAO 4.18 macOS DMG archive
 
 Step-by-step installation instructions:
 
@@ -32,13 +32,11 @@ Notes and Limitations
 
 2. The setup scripts are not the standard setup scripts you would get
    with either the "conda create" or the "ciao-install" installation
-   options.
-
-   - The various flags are not available such as "-o" and "-q".
+   options. The various flags are not available such as "-o" and "-q".
 
 3. To update any CIAO component requires users uninstall the existing
-   ciao-4.18 installation and replacing it with the updated .dmg file.
-   To unintall CIAO simply drag the /Applications/ciao-4.18 folder to
+   ciao-4.18 installation and replace it with the updated .dmg file.
+   To uninstall CIAO simply drag the /Applications/ciao-4.18 folder to
    the Trash.
 
 
