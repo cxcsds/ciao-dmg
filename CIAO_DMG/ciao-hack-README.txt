@@ -1,4 +1,4 @@
-CIAO 4.18.0.b1 macOS DMG archive
+CIAO 4.18.0 macOS DMG archive
 
 Step-by-step installation instructions:
 
@@ -10,8 +10,6 @@ Step-by-step installation instructions:
 3. Open the Terminal application and then run the following command
 
       xattr -cr /Applications/ciao-4.18
-
-   You can ignore the permission warnings/errors.
 
 4. Source the CIAO setup script.
 
@@ -37,11 +35,9 @@ Notes and Limitations
    options.
 
    - The various flags are not available such as "-o" and "-q".
-   - During the smoke tests the ciao version (ciaover output) will
-     be displayed repeated. This is expected.
 
 3. To update any CIAO component requires users uninstall the existing
-   ciao-4.18 installation and replace it with the updated .dmg file.
+   ciao-4.18 installation and replacing it with the updated .dmg file.
    To unintall CIAO simply drag the /Applications/ciao-4.18 folder to
    the Trash.
 
@@ -67,7 +63,7 @@ file in the root directory of the $ASCDS_INSTALL tree.
 
 Copyrights
 
-Copyright (c) 1999 2023 Smithsonian Astrophysical Observatory
+Copyright (c) 1999-2025 Smithsonian Astrophysical Observatory
 
 Permission to use, copy, modify, distribute,  and  sell  this
 software  and  its  documentation  for  any purpose is hereby
