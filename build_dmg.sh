@@ -3,9 +3,9 @@
 
 TMPDIR=foo
 PATCH_DIR=/Users/kjg/Temp/DMG/ciao-dmg/CIAO_DMG
-VER=4.18.0.X
+VER=4.18.0.Y
 OS=`uname -m`
-BUILD=2359
+BUILD=2729
 TAG=${VER}.$(date +%Y%m%d)
 
 BACKGROUND=${PATCH_DIR}/install_w_readme.png
@@ -48,7 +48,7 @@ sed "s/@VER@/${VER}/" ${PATCH_DIR}/ciao.csh > ${TMPDIR}/ciao-${VER}/bin/ciao.csh
 # Create initial disk image, RW so we can add .DS_Store
 # TODO -- estimate size on fly, need to add extra for .DS_Store
 /bin/rm -f tmp_ciao-${VER}.dmg 
-hdiutil create -size 19.1Gb -format UDRW \
+hdiutil create -size 19.1Gb -format UDRW  -fs HFS+J \
    -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
    
 # Add .DS_Store
