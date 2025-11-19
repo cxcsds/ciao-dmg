@@ -28,7 +28,7 @@ Step-by-step installation instructions:
 
 Notes and Limitations
 
-1. You must install ciao-4.18 into the Applications folder.
+1. You must install ciao-4.18 into the /Applications folder.
 
 2. The setup scripts are not the standard setup scripts you would get
    with either the "conda create" or the "ciao-install" installation
