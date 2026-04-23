@@ -7,7 +7,7 @@ VER=4.18
 OS=`uname -m`
 #BUILD=2729
 #TAG=${VER}.$(date +%Y%m%d)
-TAG=${VER}.0
+TAG=${VER}.0-1
 
 BACKGROUND=${PATCH_DIR}/install_w_readme.png
 DS_STORE=${PATCH_DIR}/ciao-hack-DS_Store
@@ -24,7 +24,7 @@ conda create -p /Applications/ciao-${VER} \
   --copy --yes \
   -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
   ciao=="4.18.0" sherpa=="4.18.0" \
-  ds9 marx caldb_main ciao-contrib
+  ds9 marx caldb_main=4.12.4 ciao-contrib=4.18.1 
 
 # Move it to temp dir and patch in files
 

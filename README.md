@@ -1,7 +1,7 @@
 # Create macOS .dmg installer for CIAO
 
 This repro contains a script and artifacts needed create a macOS .dmg
-file to install CIAO 4.17 (including full CALDB, sans source code) into
+file to install CIAO 4.18 (including full CALDB, sans source code) into
 the /Applications folder.
 
 ## Walk through steps
@@ -11,17 +11,17 @@ the /Applications folder.
 
 Since `ciao-install` is borked, we use `conda` to install CIAO.
 
-**It must be installed in `/Applications/ciao-4.17` so we use the `-p` (prefix)
+**It must be installed in `/Applications/ciao-4.18` so we use the `-p` (prefix)
 flag**
 
 ```bash
 conda create -p /Applications/ciao-${VER} \
   --copy --yes \
   -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
-  ciao pyciao ciao-contrib sherpa ds9 marx caldb_main
+  ciao ciao-contrib sherpa ds9 marx caldb_main
 ```
 
-Note: you could add `ciao-src pyciao-src sherpa-src` if we wanted that.
+Note: you could add `ciao-src sherpa-src` if we wanted that.
 We decided to drop acis and hrc blank sky background files.
 
 ---
@@ -30,7 +30,7 @@ We decided to drop acis and hrc blank sky background files.
 
 To create the `.dmg` file we need to have a folder with 
 
-- ciao-4.17
+- ciao-4.18
 - symlink to Applications folder
 
 We can also add a background image that can be used to tell the user
@@ -60,7 +60,7 @@ cause warnings when running `xattr` (below).
 
 This is a conda environment and does not use ciao.*sh for setup.
 
-Instead is uses the files in the ciao-4.17/etc/conda/activate.d/*sh .
+Instead is uses the files in the ciao-4.18/etc/conda/activate.d/*sh .
 
 So I wrote two simple replacement setup scripts that source all the 
 setup scripts in the activate.d directory. 
@@ -89,7 +89,7 @@ hdiutil create -size 19.1Gb -format UDRW  \
    -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
 ```
 
-The `-size 19.1Gb` is sufficient for CIAO 4.17 but will need to be reviewed/revised
+The `-size 19.1Gb` is sufficient for CIAO 4.18 but will need to be reviewed/revised
 for future releases.  `fs` = "file system" , `HFS+J` is the macOS file system. 
 `UDRW` creates a read+write format disk image.
 
@@ -113,7 +113,7 @@ It will show up as a drive on the desktop.
 
 Double click on the drive will open it in Finder.
 
-You will see the ciao-4.17 folder, the Applications folder symbolic link, 
+You will see the ciao-4.18 folder, the Applications folder symbolic link, 
 and the README.txt file.
 
 Hit `Cmd+Shift+.` which will show the hidden files/folders.   Double click to
