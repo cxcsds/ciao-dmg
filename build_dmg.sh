@@ -3,10 +3,11 @@
 
 TMPDIR=foo
 PATCH_DIR=/Users/kjg/Temp/DMG/ciao-dmg/CIAO_DMG
-VER=4.18.0.Y
+VER=4.18
 OS=`uname -m`
-BUILD=2729
-TAG=${VER}.$(date +%Y%m%d)
+#BUILD=2729
+#TAG=${VER}.$(date +%Y%m%d)
+TAG=${VER}.0
 
 BACKGROUND=${PATCH_DIR}/install_w_readme.png
 DS_STORE=${PATCH_DIR}/ciao-hack-DS_Store
@@ -21,8 +22,9 @@ README=${PATCH_DIR}/ciao-hack-README.txt
 
 conda create -p /Applications/ciao-${VER} \
   --copy --yes \
-  -c https://cxc-test.cfa.harvard.edu/conda/test -c conda-forge \
-  ciao=="4.18.0.dev=*_${BUILD}" ciao-contrib sherpa=="4.17.1.dev=*_${BUILD}" ds9 marx caldb_main
+  -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
+  ciao=="4.18.0" sherpa=="4.18.0" \
+  ds9 marx caldb_main ciao-contrib
 
 # Move it to temp dir and patch in files
 
@@ -57,7 +59,7 @@ hdiutil attach -readwrite tmp_ciao-${VER}.dmg
 hdiutil detach "/Volumes/CIAO ${VER}"
 
 # Create final compressed, read-only image
-rm ciao-${TAG}-${OS}.dmg
+rm -f ciao-${TAG}-${OS}.dmg
 hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${TAG}-${OS}.dmg
 
 rm tmp_ciao-${VER}.dmg
