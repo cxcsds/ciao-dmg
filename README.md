@@ -18,7 +18,7 @@ flag**
 conda create -p /Applications/ciao-${VER} \
   --copy --yes \
   -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge \
-  ciao ciao-contrib sherpa ds9 marx caldb_main
+  ciao ciao-contrib sherpa ds9 marx caldb_main numpy=2.3.5
 ```
 
 Note: you could add `ciao-src sherpa-src` if we wanted that.
