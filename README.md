@@ -31,28 +31,23 @@ We decided to drop acis and hrc blank sky background files.
 To create the `.dmg` file we need to have a folder with 
 
 - ciao-4.18
-- symlink to Applications folder
+- README.txt
 
-We can also add a background image that can be used to tell the user
-how to install (Drag folder to Applications).
-
-We also made a copy of the instructions and put them into a README.txt
+We made a copy of the instructions and put them into a README.txt.
+The background image (which tells the user how to install: drag folder
+to Applications) and the symlink to the Applications folder are added
+by `dmgbuild` in step 3.
 
 ```bash
 mkdir ${TMPDIR}
 mv /Applications/ciao-${VER} ${TMPDIR}/
 find ${TMPDIR}/ciao-${VER}  -type f \! -perm +u+w -exec chmod u+w {} \;
 
-mkdir ${TMPDIR}/.background
-cp ${BACKGROUND} ${TMPDIR}/.background
-
 cp ${README} ${TMPDIR}/README.txt
-
-ln -s /Applications ${TMPDIR}/
 ```
 
 The `find` command was added to chmod the read-only files as they
-cause warnings when running `xattr` (below). 
+cause warnings when running `xattr`.
 
 ---
 
@@ -75,107 +70,79 @@ cp ${PATCH_DIR}/ciao.*sh ${TMPDIR}/ciao-${VER}/bin/
 
 ---
 
-### 3 Create disk image (ie .dmg file)
+### 3. Create disk image (ie .dmg file)
 
-Thanks to reviewing the `ds9` `Makefile`, I learned about the `hdiutil`
-command that can be used to create disk images via the command line and
-manipulate them (create, attach, detach, convert). 
-
-First we need to create a read+write version of the .dmg
+We use [`dmgbuild`](https://github.com/dmgbuild/dmgbuild) to create the
+disk image.  It must be run on macOS.  Install it with
 
 ```bash
-/bin/rm -f tmp_ciao-${VER}.dmg 
-hdiutil create -size 19.1Gb -format UDRW  \
-   -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
+pip install dmgbuild
 ```
 
-The `-size 19.1Gb` is sufficient for CIAO 4.18 but will need to be reviewed/revised
-for future releases.  `fs` = "file system" , `HFS+J` is the macOS file system. 
-`UDRW` creates a read+write format disk image.
-
-#### 3.1 Set background image/patch in .DS_Store file
-
-This step needs to be done manually the first time (or any time the
-background image changes).
-
-First we need to attach (ie open) the disk image we just created.
-
-```
-hdiutil attach -readwrite tmp_ciao-${VER}.dmg
-```
-
-It will show up as a drive on the desktop.
-
----
-
-##### 3.1.1 First time
-
-
-Double click on the drive will open it in Finder.
-
-You will see the ciao-4.18 folder, the Applications folder symbolic link, 
-and the README.txt file.
-
-Hit `Cmd+Shift+.` which will show the hidden files/folders.   Double click to
-open the `.background` folder in a new Finder window.
-
-Go back the original .dmg Finder window and right click. Select `Show View Options`
-and in the `Background Options` select Picture.  Now drag the image 
-`install_w_readme.png` to the background option. You should now see the
-installation instruction background 
-
-Close the `.background` finder window and hit `Cmd+Shift+.` to hide 
-hidden files/folders.
-
-Now re-arrange, resize icons & window as desired. 
-
-When done close the Finder window but do not eject the image yet.
-
-Open the Terminal applications and copy the hidden, system `.DS_Store` file
+`dmgbuild` creates the image, copies in the files (using `ditto`, which
+preserves symlinks, permissions, and extended attributes), adds the
+`/Applications` symlink and background image, and writes the hidden
+`.DS_Store` file that sets the window size, background, and icon
+size/positions.  It then converts it to a compressed (`UDZO`), read-only
+image.  The image size is computed from the contents.
 
 ```bash
-(cd "/Volumes/CIAO ${VER}" ; cp .DS_Store ~/ciao-hack-DS_Store)
+rm -f ciao-${TAG}-${OS}.dmg
+dmgbuild -s ${PATCH_DIR}/dmg_settings.py \
+  -D ver=${VER} -D tmpdir=${TMPDIR} -D background=${BACKGROUND} \
+  "CIAO ${VER}" ciao-${TAG}-${OS}.dmg
 ```
 
-This file contains all the information about the icon location, size,
-background, window size, etc.  Upshot: you can save this file and then
-next time you want to create the image, you just need to copy
-this file into place.
+If the computed size is ever too small, add e.g. `-D size=20g`.
 
----
+#### 3.1 Changing the layout
 
-##### 3.3.2 After the first time
+The Finder window layout lives in `CIAO_DMG/dmg_settings.py`:
 
-After the first time manually creating the `.DS_Store` file you can then
-just copy it onto the disk image. _This is why the disk image needed to be
-created read+write_.  Note: Trying to copy the .DS_Store before the disk image
-is created doesn't work (or didn't work for me) so this requires this extra step.
+- `window_rect` -- window position and size, `((x, y), (width, height))`
+- `icon_size`, `text_size` -- icon and label sizes
+- `icon_locations` -- position of each item in the window
+- `background` -- passed in on the command line (`install_w_readme.png`)
+
+The current values were taken from the `.DS_Store` file that was
+originally made by hand in Finder (`CIAO_DMG/ciao-hack-DS_Store`, kept
+for reference but no longer used).  If the background image changes,
+adjust `window_rect` and `icon_locations` to match.
+
+One way to find new values: mount a built image read+write, arrange
+the window in Finder, then use the `ds_store` Python package (installed
+with `dmgbuild`) to print the `.DS_Store` contents:
 
 ```bash
-(cd "/Volumes/CIAO ${VER}"; cp -fv ${DS_STORE} .DS_Store)
+hdiutil convert ciao-${TAG}-${OS}.dmg -format UDRW -o tmp_ciao.dmg
+hdiutil attach -readwrite tmp_ciao.dmg
+# ... arrange the window in Finder, then close it ...
+python3 -c '
+import sys
+import ds_store.store
+ds_store.store.codecs.pop(b"pBBk", None)  # some bookmarks fail to decode
+from ds_store import DSStore
+with DSStore.open(sys.argv[1]) as d:
+    for e in d:
+        if e.code in (b"Iloc", b"bwsp"):
+            print(e.filename, e.code, e.value)
+' "/Volumes/CIAO ${VER}/.DS_Store"
+hdiutil detach "/Volumes/CIAO ${VER}"
+rm tmp_ciao.dmg
 ```
+
+`Iloc` gives the icon positions and `WindowBounds` in `bwsp` gives
+`window_rect`.
 
 ---
 
 ### 4. Finish
 
-First we detach the temp image now that the .DS_Store file has been created/copied.
+Remove the `${TMPDIR}`
 
 ```bash
-hdiutil detach "/Volumes/CIAO ${VER}"
+/bin/rm -rf ${TMPDIR}
 ```
-
-and finally we can create the compressed, read-only disk image
-
-
-```bash
-rm ciao-${VER}-${OS}.dmg
-hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${VER}-${OS}.dmg
-
-rm tmp_ciao-${VER}.dmg
-```
-
-You may also want to go ahead and remove the `${TMPDIR}`
 
 ## Summary
 

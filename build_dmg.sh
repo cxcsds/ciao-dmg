@@ -10,8 +10,15 @@ OS=`uname -m`
 TAG=${VER}.0-2a
 
 BACKGROUND=${PATCH_DIR}/install_w_readme.png
-DS_STORE=${PATCH_DIR}/ciao-hack-DS_Store
 README=${PATCH_DIR}/ciao-hack-README.txt
+DMG_SETTINGS=${PATCH_DIR}/dmg_settings.py
+
+# dmgbuild (pip install dmgbuild) writes the .DS_Store (background,
+# icon size/positions) so no manual Finder step is needed.
+if ! command -v dmgbuild > /dev/null ; then
+  echo "ERROR: dmgbuild not found; install with 'pip install dmgbuild'" 1>&2
+  exit 1
+fi
 
 # Create conda environment in /Applications folder
 
@@ -32,12 +39,7 @@ mkdir -p ${TMPDIR}
 mv /Applications/ciao-${VER} ${TMPDIR}/
 find ${TMPDIR}/ciao-${VER}  -type f \! -perm +u+w -exec chmod u+w {} \;
 
-mkdir ${TMPDIR}/.background
-cp ${BACKGROUND} ${TMPDIR}/.background
-
 cp ${README} ${TMPDIR}/README.txt
-
-ln -s /Applications ${TMPDIR}/
 
 # --------------------
 # Add in setup scripts
@@ -47,20 +49,13 @@ sed "s/@VER@/${VER}/" ${PATCH_DIR}/ciao.csh > ${TMPDIR}/ciao-${VER}/bin/ciao.csh
 
 # -------------------
 
-# Create initial disk image, RW so we can add .DS_Store
-# TODO -- estimate size on fly, need to add extra for .DS_Store
-/bin/rm -f tmp_ciao-${VER}.dmg 
-hdiutil create -size 19.1Gb -format UDRW  -fs HFS+J \
-   -volname "CIAO ${VER}"  -srcfolder ${TMPDIR} tmp_ciao-${VER}.dmg 
-   
-# Add .DS_Store
-hdiutil attach -readwrite tmp_ciao-${VER}.dmg
-(cd "/Volumes/CIAO ${VER}"; cp -fv ${DS_STORE} .DS_Store)
-hdiutil detach "/Volumes/CIAO ${VER}"
+# Create compressed, read-only disk image.  dmgbuild adds the
+# background image, /Applications symlink, and .DS_Store, and
+# computes the image size from the contents.
 
-# Create final compressed, read-only image
 rm -f ciao-${TAG}-${OS}.dmg
-hdiutil convert tmp_ciao-${VER}.dmg -format UDZO -o ciao-${TAG}-${OS}.dmg
+dmgbuild -s ${DMG_SETTINGS} \
+  -D ver=${VER} -D tmpdir=${TMPDIR} -D background=${BACKGROUND} \
+  "CIAO ${VER}" ciao-${TAG}-${OS}.dmg || exit 1
 
-rm tmp_ciao-${VER}.dmg
 /bin/rm -rf ${TMPDIR}
