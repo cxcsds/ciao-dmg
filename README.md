@@ -76,8 +76,13 @@ We use [`dmgbuild`](https://github.com/dmgbuild/dmgbuild) to create the
 disk image.  It must be run on macOS.  Install it with
 
 ```bash
-pip install dmgbuild
+pip install "dmgbuild<2"
 ```
+
+dmgbuild 2.x uses `diskutil image`, which only exists on macOS 14
+(Sonoma) and later; on older macOS it fails with
+`diskutil: did not recognize verb "image"`.  dmgbuild 1.6.x uses
+`hdiutil` and works on older releases.
 
 `dmgbuild` creates the image, copies in the files (using `ditto`, which
 preserves symlinks, permissions, and extended attributes), adds the

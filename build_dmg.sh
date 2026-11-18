@@ -13,10 +13,10 @@ BACKGROUND=${PATCH_DIR}/install_w_readme.png
 README=${PATCH_DIR}/ciao-hack-README.txt
 DMG_SETTINGS=${PATCH_DIR}/dmg_settings.py
 
-# dmgbuild (pip install dmgbuild) writes the .DS_Store (background,
+# dmgbuild (pip install 'dmgbuild<2') writes the .DS_Store (background,
 # icon size/positions) so no manual Finder step is needed.
 if ! command -v dmgbuild > /dev/null ; then
-  echo "ERROR: dmgbuild not found; install with 'pip install dmgbuild'" 1>&2
+  echo "ERROR: dmgbuild not found; install with: pip install \"dmgbuild<2\"" 1>&2
   exit 1
 fi
 
